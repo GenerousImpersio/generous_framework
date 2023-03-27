@@ -1,15 +1,20 @@
 import { Item, Weapon } from "./item"
 import Config from "../config.json";
-import * as Utils from "../utils/utils";
+import { InventoryManager } from "./inventorymanager";
+import { IsItAWeapon, isEmpty } from "../utils/utils";
+
+interface Dictionary<T> {
+    [Key: string]: T;
+}
 
 class Inventory {
     type: string;
     owner: string;
-    items: Item[];
+    items: Dictionary<Item | Weapon>;
     Locked: boolean;
     weight: number;
 
-    constructor (type: string, owner: string, items: Item[]) {
+    constructor (type: string, owner: string, items: Dictionary<Item | Weapon>) {
         this.type = type;
         this.owner = owner;
         this.items = items;
@@ -29,23 +34,21 @@ class Inventory {
     GetItem(itemName: string) {
         let requestedItems : Item[] = [];
 
-        this.items.forEach((item, slot) => {
+        for (const [slot, item] of Object.entries(this.items)) {
             if (item.itemName == itemName) {
                 requestedItems[slot] = item;
             }
-        });
+        }
 
         return requestedItems;
     }
 
     Refresh() {
         let inventoryToCompare = { type:this.type, owner: this.owner };
-        let playersToUpdate = GetKeyByValue(viewedInventories, inventoryToCompare);
+        let playersToUpdate = InventoryManager.GetPlayerIdentifiersViewingInventory(inventoryToCompare);
     
-        let uniquePlayersToUpdate = [...new Set(playersToUpdate)];
-    
-        for (let index = 0; index < uniquePlayersToUpdate.length; index++) {
-            let player = uniquePlayersToUpdate[index];
+        for (let index = 0; index < playersToUpdate.length; index++) {
+            let player = playersToUpdate[index];
             emitNet("client-force-update-inventories", player); 
         }
     }
@@ -61,15 +64,15 @@ class Inventory {
 
     async AddItem(itemName: string, itemCount: number, itemData?: object) {
         // Checking is item valid.
-        if (!(itemName in Items)) {
+        if (!(itemName in InventoryManager.ItemBaseTypes)) {
             console.log("Specified item was not valid at inventory: " + this.owner + " Item name: " + itemName);
             return;
         }
 
-        let IsItAWeapon : boolean = Utils.IsItAWeapon(itemName);
+        let IsItAWeapon : boolean = itemName.includes(Config.weaponPrefix);
 
         // Check if item can store data
-        if (Items[itemName].canStacked || !IsItAWeapon) {
+        if (InventoryManager.ItemBaseTypes[itemName].canStacked || !IsItAWeapon) {
             // Can't have metadata
 
             let foundItems = this.GetItem(itemName);
@@ -82,7 +85,7 @@ class Inventory {
                     return;
                 }
 
-                this.items[this.GetFirstAvailableSlot()] = new Item(itemName, Items[itemName].label, itemCount, itemData);
+                this.items[this.GetFirstAvailableSlot()] = new Item(itemName, InventoryManager.ItemBaseTypes[itemName].label, itemCount, itemData);
                 this.Refresh()
                 await this.UpdateDatabase(() => {});
             } else {
@@ -104,8 +107,8 @@ class Inventory {
                 console.log("There is no room for another item!");
             }
             
-            this.items[firstAvailableSlot] = IsItAWeapon ? new Weapon(itemName, Items[itemName].label) : 
-                new Item(itemName, Items[itemName].label, itemCount);
+            this.items[firstAvailableSlot] = IsItAWeapon ? new Weapon(itemName, InventoryManager.ItemBaseTypes[itemName].label) : 
+                new Item(itemName, InventoryManager.ItemBaseTypes[itemName].label, itemCount);
             
             this.Refresh()
             await this.UpdateDatabase(() => {});
@@ -120,7 +123,7 @@ class Inventory {
     GetItemCountInventoryHas(itemName: string) {
         let count = 0;
         let items = this.GetItem(itemName);
-        if (Utils.IsItAWeapon(itemName)) {
+        if (IsItAWeapon(itemName)) {
             return items.length;
         } else {
             items.forEach((item) => {
@@ -134,13 +137,13 @@ class Inventory {
     async RemoveItem(itemName: string, itemCount: number) {
 
         // Checking is item valid.
-        if (!(itemName in Items)) {
+        if (!(itemName in InventoryManager.ItemBaseTypes)) {
             console.log("Specified item was not valid at inventory: " + this.owner + " Item name: " + itemName);
             return;
         }
 
         let foundItems = this.GetItem(itemName);
-        if (Utils.isEmpty(foundItems)) {
+        if (isEmpty(foundItems)) {
             // Player don't have that item
             console.log("ERROR: Tried to remove an item player don't have!");
             return;
@@ -151,7 +154,7 @@ class Inventory {
             return;
         }
 
-        if (Utils.IsItAWeapon(itemName)) {
+        if (IsItAWeapon(itemName)) {
             // It is a weapon
 
             for (let index = 0; index < itemCount; index++) {
@@ -207,14 +210,14 @@ class Inventory {
 
     CalculateInventoryWeight() {
         let inventoryWeight = 0;
-    
-        this.items.forEach((item) => {
-            let itemWeight = Items[item.itemName].weight;
+
+        for (const [slot, item] of Object.entries(this.items)) {
+            let itemWeight = InventoryManager.ItemBaseTypes[item.itemName].weight;
             if (itemWeight == null) {
                 itemWeight = 0.1;
             }
             inventoryWeight += itemWeight * (item.itemCount || 1);
-        });
+        }
     
         return inventoryWeight;
     }
@@ -223,14 +226,14 @@ class Inventory {
         if (this.type == "drop") return true;
 
         let maximumWeight = Config.playerInventoryMaximumWeight;
-        let totalWeightNeeded = Items[itemName].weight * count;
+        let totalWeightNeeded = InventoryManager.ItemBaseTypes[itemName].weight * count;
         let currentInventoryWeight = this.weight;
     
         return (currentInventoryWeight + totalWeightNeeded) <= maximumWeight;
     }
 
     IsEmpty() {
-        return this.items.length == 0;
+        return Object.keys(this.items).length == 0;
     }
 }
 
@@ -291,7 +294,7 @@ class DropInventory extends Inventory {
     }
 
     async UpdateDatabase() {
-        dropInventories[this.owner].items = this.items;
+        InventoryManager.inventories["drop"][this.owner].items = this.items;
         
         if (!this.IsEmpty()) {
             emitNet('client-register-new-drop', -1, this.owner);
@@ -313,4 +316,4 @@ class ShopInventory extends Inventory {
     }
 }
 
- 
+export {Inventory, TrunkInventory, GloveboxInventory, StashInventory, DropInventory, ShopInventory}

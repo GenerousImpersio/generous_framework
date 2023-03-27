@@ -1,10 +1,14 @@
 import Config from "../config.json";
 
+interface Dictionary<T> {
+    [Key: string]: T;
+}
+
 class Item {
     itemName: string;
     itemLabel: string;
     itemCount: number;
-    itemData: Object;
+    itemData: Dictionary<any>;
     constructor (itemName: string, itemLabel: string, itemCount: number, itemData?: object) {
         this.itemName = itemName;
         this.itemLabel = itemLabel;
@@ -18,29 +22,32 @@ class Item {
 }
 
 class Weapon extends Item {
-    weaponName: string;
-    weaponLabel: string;
-    weaponData: IWeaponData;
-    
+    itemData: IWeaponData;
     constructor(weaponName: string, weaponLabel: string, weaponData?: IWeaponData) {
         super(weaponName, weaponLabel, 1, weaponData);
+        if (typeof weaponData === 'undefined')
+            weaponData = GenerateNewWeaponData();
+        else
+            this.itemData = weaponData;
     }
 
-    private GenerateNewWeaponData() {
-        let weaponLicense = this.GenerateWeaponLicenseKey();
-        return { license: weaponLicense, durability: Config.defaultWeaponDurability, ammoCount: 0 };
+
+}
+
+function GenerateNewWeaponData(): IWeaponData {
+    let weaponLicense = this.GenerateWeaponLicenseKey();
+    return { license: weaponLicense, durability: Config.defaultWeaponDurability, ammoCount: 0 };
+}
+
+function GenerateWeaponLicenseKey() {
+    let randomLicenseKey = "";
+
+    for (let index = 0; index < Config.licenseNumberCount; index++) {
+        let randomNumber = Math.floor(Math.random() * 10);
+        randomLicenseKey += randomNumber; 
     }
 
-    private GenerateWeaponLicenseKey() {
-        let randomLicenseKey = "";
-    
-        for (let index = 0; index < Config.licenseNumberCount; index++) {
-            let randomNumber = Math.floor(Math.random() * 10);
-            randomLicenseKey += randomNumber; 
-        }
-    
-        return Config.licensePrefix + randomLicenseKey;
-    }
+    return Config.licensePrefix + randomLicenseKey;
 }
 
 interface IWeaponData {
