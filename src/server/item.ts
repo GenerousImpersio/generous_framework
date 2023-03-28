@@ -35,7 +35,7 @@ class Weapon extends Item {
 }
 
 function GenerateNewWeaponData(): IWeaponData {
-    let weaponLicense = this.GenerateWeaponLicenseKey();
+    let weaponLicense = GenerateWeaponLicenseKey();
     return { license: weaponLicense, durability: Config.defaultWeaponDurability, ammoCount: 0 };
 }
 
