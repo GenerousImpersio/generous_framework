@@ -459,6 +459,7 @@ onNet('client-request-open-player', async (data) => {
     }
 
     InventoryManager.viewedInventories[src] = dataParsed;
+    playerInventory.playersViewing.push(src);
     emitNet("server-open-inventory", src, playerInventory, targetPlayerInventory);
 });
 
@@ -484,6 +485,7 @@ onNet('client-request-open-drop', async (data) => {
     }
 
     InventoryManager.viewedInventories[src] = dataParsed;
+    dropInventory.playersViewing.push(src);
     emitNet("server-open-inventory", src, playerInventory, dropInventory);
 });
 
@@ -510,6 +512,7 @@ onNet('client-request-open-stash', async (data) => {
     }
 
     InventoryManager.viewedInventories[src] = dataParsed;
+    stashInventory.playersViewing.push(src);
     emitNet("server-open-inventory", src, playerInventory, stashInventory);
 });
 
@@ -543,14 +546,12 @@ onNet('client-inventory-give-item-request', async (currentSlot, currentIdentifie
 
 onNet("client-request-close-inv", async (data) => {
     let src = source
-    if (data != null) {
-        // secondary inventory was a player inventory
-        let parsedData = JSON.parse(data);
-        let targetSrc = parsedData.owner;
-        InventoryManager.GetInventory("player", GetPlayerIdentifier(targetSrc, 0)).Locked = false;
-    }
 
-    delete InventoryManager.viewedInventories[src];
+    let parsedData: { type: string; owner: string; stashName?: string } = JSON.parse(data);
+    let targetSrc = parsedData.owner;
+    InventoryManager.GetInventory("player", GetPlayerIdentifier(targetSrc, 0)).Locked = false;
+    InventoryManager.GetInventory(parsedData.type, parsedData.owner, parsedData.stashName).playersViewing;
+    
 });
 
 

@@ -13,6 +13,7 @@ class Inventory {
     items: Dictionary<Item | Weapon>;
     Locked: boolean;
     weight: number;
+    playersViewing: Array<number>;
 
     constructor (type: string, owner: string, items: Dictionary<Item | Weapon>) {
         this.type = type;

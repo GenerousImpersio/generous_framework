@@ -11,6 +11,12 @@ let dropsInWorld = [];
 
 let isInInventory = false;
 
+declare global {
+    interface Array<T> {
+        remove(o: T): Array<T>;
+    }
+}
+
 exports("GetWeaponSlotID", () => {
     return lastUsedWeaponSlot;
 });
@@ -271,98 +277,7 @@ on('esx:setJob', (job) => {
 function GiveWeapon(weapon) {
     let playerPed = PlayerPedId();
     let hash = GetHashKey(weapon);
-    ESX.TriggerServerCallback('generous_inventory:server:getAmmoCount', function(ammoCount, susturucu, fener, tutamac, kaplama, durbun, uzatilmis) {
-        GiveWeaponToPed(playerPed, hash, 1, false, true)
-
-        if (susturucu == 1) {
-            if (hash == GetHashKey("WEAPON_PISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), GetHashKey("component_at_pi_supp_02"))
-            } else if ( table.includes(supp1, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0x837445AA)
-            } else if ( table.includes(supp2, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0xA73D4664)
-            } else if ( table.includes(supp3, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0xC304849A)
-            } else if ( table.includes(supp4, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0xE608B35E)
-            }
-        }
-
-        if (uzatilmis == 1)  {
-            if ( hash == GetHashKey("WEAPON_PISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), GetHashKey("COMPONENT_PISTOL_CLIP_02"))
-            } else if ( hash == GetHashKey("WEAPON_PISTOL50"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL50"), GetHashKey("COMPONENT_PISTOL50_CLIP_02"))    
-            } else if ( hash == GetHashKey("WEAPON_APPISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_APPISTOL"), GetHashKey("COMPONENT_APPISTOL_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_HEAVYPISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_HEAVYPISTOL"), GetHashKey("COMPONENT_HEAVYPISTOL_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_SMG"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_SMG"), GetHashKey("COMPONENT_SMG_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_MICROSMG"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_MICROSMG"), GetHashKey("COMPONENT_MICROSMG_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_ASSAULTRIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_ASSAULTRIFLE"), GetHashKey("COMPONENT_ASSAULTRIFLE_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_CARBINERIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_CARBINERIFLE"), GetHashKey("COMPONENT_CARBINERIFLE_CLIP_02"))
-   
-            } else if ( hash == GetHashKey("WEAPON_ADVANCEDRIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_ADVANCEDRIFLE"), GetHashKey("COMPONENT_ADVANCEDRIFLE_CLIP_02"))
-            }
-        }
-
-        if ( fener == 1)  {
-            if ( table.includes(flash1, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0x359B7AAE)
-            } else if ( table.includes(flash2, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0x7BC4CDDC)
-            }
-        }
-
-        if (kaplama == 1)  {
-            if (hash == GetHashKey("WEAPON_PISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), GetHashKey("COMPONENT_PISTOL_VARMOD_LUXE"))
-            } else if ( hash == GetHashKey("WEAPON_PISTOL50"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL50"), GetHashKey("COMPONENT_PISTOL50_VARMOD_LUXE"))
-            } else if ( hash == GetHashKey("WEAPON_APPISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_APPISTOL"), GetHashKey("COMPONENT_APPISTOL_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_HEAVYPISTOL"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_HEAVYPISTOL"), GetHashKey("COMPONENT_HEAVYPISTOL_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_SMG"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_SMG"), GetHashKey("COMPONENT_SMG_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_MICROSMG"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_MICROSMG"), GetHashKey("COMPONENT_MICROSMG_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_ASSAULTRIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_ASSAULTRIFLE"), GetHashKey("COMPONENT_ASSAULTRIFLE_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_CARBINERIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_CARBINERIFLE"), GetHashKey("COMPONENT_CARBINERIFLE_VARMOD_LUXE"))
-
-            } else if ( hash == GetHashKey("WEAPON_ADVANCEDRIFLE"))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), GetHashKey("WEAPON_ADVANCEDRIFLE"), GetHashKey("COMPONENT_ADVANCEDRIFLE_VARMOD_LUXE"))
-            }
-        }
-
-        if ( tutamac ==  1)  {
-            if ( table.includes(grip1, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0xC164F53)
-            }
-        }
-
-        if ( durbun ==  1)  {
-            if ( table.includes(scope1, hash))  {
-                GiveWeaponComponentToPed(GetPlayerPed(-1), hash, 0xA0D89C42)
-            }
-        }
+    ESX.TriggerServerCallback('generous_inventory:server:getAmmoCount', function(ammoCount) {
 
         SetPedAmmo(playerPed, hash, ammoCount || 0);
 
@@ -446,7 +361,7 @@ async function SelectPlayerToGive(currentSlot, currentIdentifier, itemAmount) {
                     focusedPedIndex = 0;
                 }
             }
-            DrawMarker(2, targetCoords[0], targetCoords[1], targetCoords[2] + 1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 55, 255, 55, 100, false, true, 2, true, false, false, false);
+            DrawMarker(2, targetCoords[0], targetCoords[1], targetCoords[2] + 1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 55, 255, 55, 100, false, true, 2, false, null, null, true);
 
             if (IsControlJustPressed(0, 175)) {
                 console.log(focusedPedIndex)
@@ -551,7 +466,7 @@ function DrawText3D(x, y, z, scale, text) {
     let _y = worldToScreenOutput[2];
     SetTextScale(scale, scale); 
     SetTextFont(4); 
-    SetTextProportional(1); 
+    SetTextProportional(true); 
     SetTextEntry("STRING"); 
     SetTextCentre(true); 
     SetTextColour(255, 255, 255, 215); 
@@ -573,15 +488,8 @@ function closeInventory() {
     SetNuiFocus(false, false);
     ClearPedSecondaryTask(PlayerPedId());
 
-    let parsedSecondaryInventory = JSON.parse(lastOpenSecondaryInventory);
-
-    if (parsedSecondaryInventory.type == "player") {
-        emitNet("client-request-close-inv", lastOpenSecondaryInventory);
-        lastOpenSecondaryInventory = null;
-    } else {
-        emitNet("client-request-close-inv");
-        lastOpenSecondaryInventory = null;
-    }
+    emitNet("client-request-close-inv", lastOpenSecondaryInventory);
+    lastOpenSecondaryInventory = null;
 }
 
 
@@ -609,12 +517,12 @@ setTick(async() => {
                     let playerCoords = GetEntityCoords(PlayerPedId());
                     let distance = Vdist2(coord[0], coord[1], coord[2], playerCoords[0], playerCoords[1], playerCoords[2]);
                     if (distance < 25) {
-                        DrawMarker(market.markerType || 1, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, market.markerSize[0] || 0.2, market.markerSize[1] || 0.2, market.markerSize[2] || 0.2, market.markerColor[0] || 55, market.markerColor[0] || 255, market.markerColor[0] || 55, 100, false, true, 2, true, false, false, false);
+                        DrawMarker(market.markerType || 1, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, market.markerSize[0] || 0.2, market.markerSize[1] || 0.2, market.markerSize[2] || 0.2, market.markerColor[0] || 55, market.markerColor[0] || 255, market.markerColor[0] || 55, 100, false, true, 2, true, null, null, true);
                         if (distance < 5) {
                             if (market.use3DText) {
                                 DrawText3D(coord[0], coord[1], coord[2] + 0.3, 0.4, market.msg || '[E]');
                             } else {
-                                ESX.ShowHelpNotification(v.msg || '~INPUT_CONTEXT~');
+                                ESX.ShowHelpNotification(market.msg || '~INPUT_CONTEXT~');
                             }
                             if (IsControlJustReleased(0, 46)) {
                                 requestOpenInventory(JSON.stringify({ type: "shop", owner: Object.keys(Config.MarketList)[index] }));
@@ -672,7 +580,7 @@ setTick(async () => {
         
         let distance = Vdist2(playerCoords[0], playerCoords[1], playerCoords[2], coord[0], coord[1], coord[2]);
         if (distance < 10) {
-            DrawMarker(2, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 255, 0, 0, 100, false, true, 2, false, false, false, false);
+            DrawMarker(2, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 255, 0, 0, 100, false, true, 2, false, null, null, true);
         }
     }
 
@@ -780,7 +688,7 @@ setTick(async() => {
                     let playerPed = PlayerPedId();
                     if (!IsEntityPlayingAnim(playerPed, 'mini@repair', 'fixing_a_player', 3)) {
                         ESX.Streaming.RequestAnimDict('mini@repair', function() {
-                            TaskPlayAnim(playerPed, 'mini@repair', 'fixing_a_player', 8.0, -8, -1, 49, 0, 0, 0, 0);
+                            TaskPlayAnim(playerPed, 'mini@repair', 'fixing_a_player', 8.0, -8, -1, 49, 0, false, false, false);
                         });
                     }
                 }
@@ -802,7 +710,7 @@ setTick(async () => {
                     let coord = stash.coords[i];
                     let distance = Vdist2(coord[0], coord[1], coord[2], pcoords[0], pcoords[1], pcoords[2]);
                     if (distance < 10) {
-                        DrawMarker(stash.markerType || 2, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, stash.markerSize[0] || 0.2, stash.markerSize[0] || 0.2, stash.markerSize[0] || 0.2, stash.markerColour[0] || 55, stash.markerColour[0] || 255, stash.markerColour[0] || 55, 100, false, true, 2, false);
+                        DrawMarker(stash.markerType || 2, coord[0], coord[1], coord[2], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, stash.markerSize[0] || 0.2, stash.markerSize[0] || 0.2, stash.markerSize[0] || 0.2, stash.markerColour[0] || 55, stash.markerColour[0] || 255, stash.markerColour[0] || 55, 100, false, true, 2, false, null, null, true);
                         if (distance < 1) {
                             if (stash.use3dtext) {
                                 DrawText3D(coord[0], coord[1], coord[2] + 0.3, 0.4, stash.msg || '[E]')
@@ -811,10 +719,10 @@ setTick(async () => {
                             }
                             if (IsControlJustPressed(0, 38)) {
                                 if (ESX.PlayerData.job.name == stash.job) {
-                                    requestOpenInventory(JSON.stringify({ type: "stash", owner: stash.job, stashname: Object.keys(Config.Stashes)[index] }));
+                                    requestOpenInventory(JSON.stringify({ type: "stash", owner: stash.job, stashName: Object.keys(Config.Stashes)[index] }));
                                 } else {
                                     ESX.TriggerServerCallback('generous_inventory:server:getPlayerIdentifierOwn', (identifier) => {
-                                        requestOpenInventory(JSON.stringify({ type: "stash", owner: identifier, stashname: Object.keys(Config.Stashes)[index] }));
+                                        requestOpenInventory(JSON.stringify({ type: "stash", owner: identifier, stashName: Object.keys(Config.Stashes)[index] }));
                                     });
                                 }
                             }
@@ -831,10 +739,10 @@ on('client-stash-open-request', (stashName) => {
         let stash = Config.Stashes[stashName];
         if (stash.job == 'all') {
             ESX.TriggerServerCallback('generous_inventory:server:getPlayerIdentifierOwn', (identifier) => {
-                requestOpenInventory(JSON.stringify({ type: "stash", owner: identifier, stashname: stashName }));
+                requestOpenInventory(JSON.stringify({ type: "stash", owner: identifier, stashName: stashName }));
             });
         } else {
-            requestOpenInventory(JSON.stringify({ type: "stash", owner: stash.job, stashname: stashName }));
+            requestOpenInventory(JSON.stringify({ type: "stash", owner: stash.job, stashName: stashName }));
         }
     }
 });
